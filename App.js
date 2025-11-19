@@ -1,46 +1,68 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from './screens/HomeScreen';
-import FrasesScreen from './screens/FrasesScreen';
-import index from './screens/index';
+
+// TELAS DE AUTENTICAÇÃO
+import Index from './screens/index'; 
 import RegisterScreen from './screens/RegisterScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 
+// TELAS PRINCIPAIS E FUNCIONALIDADES
+import HomeScreen from './screens/HomeScreen';
+import DetalhesScreen from './screens/DetalhesScreen'; // Importação do componente Detalhes finalizado
+import FrasesScreen from './screens/FrasesScreen';
 import TarefasScreen from './screens/TarefasScreen';
 import TemperaturaScreen from './screens/TemperaturaScreen';
-
-import {View, Text} from 'react-native';
+import IMCscreen from './screens/IMCscreen'; // Note a correção para IMCScreen
 
 const Stack = createNativeStackNavigator();
 
-function DetalhesScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Detalhes</Text>
-    </View>
-  );
-}
-
 export default function App() {
+  const PRIMARY_COLOR = '#3498db'; // Azul Principal
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-          initialRouteName="index"
+        initialRouteName="Login"
         screenOptions={{
-          headerStyle: { backgroundColor: '#6200ee' },
+          headerStyle: { backgroundColor: PRIMARY_COLOR },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: 'bold' },
           headerTitleAlign: 'center',
-        }}>
-        <Stack.Screen name="Inicio" component={HomeScreen} />
-        <Stack.Screen name="Detalhes" component={DetalhesScreen} />
-        <Stack.Screen name="Frases" component={FrasesScreen} />
-        <Stack.Screen name="Tarefas" component={TarefasScreen} />
-        <Stack.Screen name="Temperatura" component={TemperaturaScreen} />
-        <Stack.Screen name="Login" component={index} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} /> 
+          // Oculta o cabeçalho nas telas de autenticação
+          // Você pode querer deixar o header nas telas principais, mas não no Login/Registro
+          // headerShown: false, // Descomente se quiser ocultar TODOS os headers
+        }}
+      >
+        {/* GRUPO DE AUTENTICAÇÃO */}
+        <Stack.Screen 
+            name="Login" 
+            component={Index} 
+            options={{ headerShown: false, title: 'Entrar' }} // Remove o header para login
+        />
+        <Stack.Screen 
+            name="Register" 
+            component={RegisterScreen} 
+            options={{ title: 'Criar Conta' }} 
+        />
+        <Stack.Screen 
+            name="ForgotPassword" 
+            component={ForgotPasswordScreen} 
+            options={{ title: 'Recuperar Senha' }} 
+        />
+
+        {/* GRUPO DE FUNCIONALIDADES */}
+        <Stack.Screen 
+            name="Inicio" 
+            component={HomeScreen} 
+            options={{ title: 'Início', headerLeft: () => null }} // Remove botão de voltar da tela inicial
+        />
+        <Stack.Screen name="Detalhes" component={DetalhesScreen} options={{ title: 'Sobre o App' }} />
+        <Stack.Screen name="Frases" component={FrasesScreen} options={{ title: 'Frases Motivacionais' }} />
+        <Stack.Screen name="Tarefas" component={TarefasScreen} options={{ title: 'Minhas Tarefas' }} />
+        <Stack.Screen name="Temperatura" component={TemperaturaScreen} options={{ title: 'Conversor de Temperatura' }} />
+        <Stack.Screen name="IMC" component={IMCscreen} options={{ title: 'Calculadora IMC' }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

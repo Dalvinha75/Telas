@@ -2,15 +2,21 @@ import * as SQLite from 'expo-sqlite';
 
 let banco;
 
+// Abre ou cria banco
 export async function conectarBanco() {
   if (!banco) {
-    banco = SQLite.openDatabaseSync('users.db'); // ✅ Use openDatabaseSync em vez de openDatabaseAsync
+    banco = SQLite.openDatabaseSync('users.db'); 
     await banco.execAsync(`PRAGMA journal_mode = WAL`);
   }
   return banco;
 }
 
-export async function criarTabela() {
+/* ======================================================
+      TABELA DE TAREFAS
+====================================================== */
+
+// Cria tabela de tarefas 
+export async function criarTabelaTarefas() {
   const db = await conectarBanco();
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS tarefas (
@@ -20,6 +26,7 @@ export async function criarTabela() {
   `);
 }
 
+// Adicionar tarefa
 export async function adicionarTarefa(titulo) {
   const db = await conectarBanco();
   const resultado = await db.runAsync(
@@ -29,12 +36,14 @@ export async function adicionarTarefa(titulo) {
   return resultado.lastInsertRowId;
 }
 
+// Listar tarefas
 export async function listarTarefas() {
   const db = await conectarBanco();
   const tarefas = await db.getAllAsync('SELECT * FROM tarefas;');
   return tarefas;
 }
 
+// Atualizar tarefa
 export async function atualizarTarefa(id, novoTitulo) {
   const db = await conectarBanco();
   await db.runAsync(
@@ -44,6 +53,7 @@ export async function atualizarTarefa(id, novoTitulo) {
   );
 }
 
+// Excluir tarefa
 export async function deletarTarefa(id) {
   const db = await conectarBanco();
   await db.runAsync(
@@ -52,37 +62,44 @@ export async function deletarTarefa(id) {
   );
 }
 
+/* ======================================================
+      TABELA DE USUÁRIOS
+====================================================== */
+
 export async function criarTabelaUsers() {
   const db = await conectarBanco();
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      usuario TEXT UNIQUE NOT NULL, 
+      usuario TEXT UNIQUE NOT NULL,
       senha TEXT NOT NULL
     );
   `);
 }
 
+// Criar usuário
 export async function createUser(usuario, senha) {
   const db = await conectarBanco();
   await db.runAsync(
-    'INSERT INTO users (usuario, senha) VALUES (?, ?)',
+    'INSERT INTO users (usuario, senha) VALUES (?, ?);',
     usuario,
     senha
   );
 }
 
+// Deletar tabela de usuários (para testes)
 export async function delBd() {
   const db = await conectarBanco();
-  await db.runAsync('DROP TABLE IF EXISTS users');
+  await db.runAsync('DROP TABLE IF EXISTS users;');
 }
 
+// Login
 export async function getUser(usuario, senha) {
   try {
     const db = await conectarBanco();
     const users = await db.getAllAsync(
-      'SELECT * FROM users WHERE usuario = ? AND senha = ?',
-      usuario, 
+      'SELECT * FROM users WHERE usuario = ? AND senha = ?;',
+      usuario,
       senha
     );
     return users.length > 0;
@@ -92,11 +109,12 @@ export async function getUser(usuario, senha) {
   }
 }
 
+// Verificar se usuário já existe
 export async function usuarioExiste(usuario) {
   try {
     const db = await conectarBanco();
     const users = await db.getAllAsync(
-      'SELECT * FROM users WHERE usuario = ?',
+      'SELECT * FROM users WHERE usuario = ?;',
       usuario
     );
     return users.length > 0;

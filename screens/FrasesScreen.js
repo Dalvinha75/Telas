@@ -1,125 +1,93 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { criarTabelaFrases, salvarFrase, listarFrases } from '../database/frasesDB';
 
-export default function App() {
-  const [frase, setFrase] = useState("Toque no botão para gerar");
+export default function FrasesScreen() {
+  const [frase, setFrase] = useState('');
+  const [frases, setFrases] = useState([]);
 
-  const frases = [
-    'Acredite em você',
-    'Você pode tudo',
-    'A vida não é fácil',
-    'Tudo é possível para aquele que crê',
-    'Você consegue',
-    'A vida não é um morango',
-    'O único lugar onde o sucesso vem antes do trabalho é no dicionário',
-    'O maior erro que você pode cometer é o de ficar o tempo todo com medo de cometer algum',
-    'Coragem não é ausência de medo, mas a habilidade de agir apesar dele',
-    'Seja a mudança que você quer ver no mundo',
-    'A persistência é o caminho do êxito',
-    'Não espere por uma oportunidade, crie-a',
-    'Acredite nos seus sonhos e eles se tornarão realidade',
-    'O sucesso é a soma de pequenos esforços repetidos dia após dia',
-    'Tudo o que você precisa já está dentro de você',
-    'Você não é derrotado quando perde, mas quando desiste',
-    'A maior vitória é a vitória sobre si mesmo',
-    'Os obstáculos são aquelas coisas assustadoras que você vê quando tira os olhos de seu objetivo',
-    'A única maneira de fazer um ótimo trabalho é amar o que você faz',
-    'O futuro pertence àqueles que acreditam na beleza dos seus sonhos',
-    'Sua vida é seu reflexo, se você quer mudá-la, mude sua atitude',
-    'Não conte os dias, faça os dias contarem',
-    'Não desista. Geralmente é a última chave no chaveiro que abre a fechadura',
-  ];
+  useEffect(() => {
+    async function iniciar() {
+      await criarTabelaFrases();
+      const todas = await listarFrases();
+      setFrases(todas);
+    }
+    iniciar();
+  }, []);
 
-  const gerarFrase = () => {
-    const indice = Math.floor(Math.random() * frases.length);
-    setFrase(frases[indice]);
-  };
+  // Gera frase aleatória
+  const gerarFrase = async () => {
+    const frasesBase = [
+      "Acredite no seu potencial!",
+      "Você é capaz de grandes coisas.",
+      "Nunca desista dos seus sonhos.",
+      "A persistência leva ao sucesso.",
+      "O importante é continuar tentando."
+    ];
 
-  const limparFrase = () => {
-    setFrase("");
+    const novaFrase = frasesBase[Math.floor(Math.random() * frasesBase.length)];
+    setFrase(novaFrase);
+
+    try {
+      await salvarFrase(novaFrase);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível salvar a nova frase");
+    }
   };
 
   return (
-    <View style={styles.app}>
-      <Text style={styles.titulo}>FRASES</Text>
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Frase Motivacional do Dia</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.frase}>{frase}</Text>
-      </View>
+      <Text style={styles.frase}>
+        {frase || "Clique no botão para gerar uma frase!"}
+      </Text>
 
-      <View style={styles.boxBtn}>
-        <Pressable
-          style={({ pressed }) => [styles.btn, pressed && { opacity: 0.8 }]}
-          onPress={gerarFrase}
-        >
-          <Text style={styles.textBtn}>Gerar</Text>
-        </Pressable>
+      <TouchableOpacity style={styles.botao} onPress={gerarFrase}>
+        <Text style={styles.botaoTexto}>Gerar Nova Frase</Text>
+      </TouchableOpacity>
 
-        <Pressable
-          style={({ pressed }) => [styles.btn, styles.secBtn, pressed && { opacity: 0.8 }]}
-          onPress={limparFrase}
-        >
-          <Text style={styles.textBtn}>Limpar</Text>
-        </Pressable>
-      </View>
+      <Text style={styles.subtitulo}>Frases já geradas:</Text>
+      {frases.map((f, index) => (
+        <Text key={index} style={styles.listaItem}>• {f.texto}</Text>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  app: {
+  container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f3f4f6',
     padding: 20,
+    backgroundColor: '#fff',
   },
   titulo: {
-    marginBottom: 30,
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-  },
-  card: {
-    width: '100%',
-    minHeight: 140,
-    backgroundColor: '#ffffff',
-    padding: 20,
-    alignItems: 'center',
-    borderRadius: 15,
-    justifyContent: 'center',
-    elevation: 10,
+    fontSize: 22,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
   frase: {
-    fontSize: 22,
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  botao: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 30,
+  },
+  botaoTexto: {
+    color: '#fff',
     textAlign: 'center',
-    color: '#444',
-    marginVertical: 10,
-    fontStyle: 'italic',
+    fontSize: 18,
   },
-  boxBtn: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'center',
-    gap: 20,
+  subtitulo: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20,
   },
-  btn: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    backgroundColor: '#3498db',
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
-  },
-  textBtn: {
-    color: 'white',
-    fontWeight: '700',
+  listaItem: {
     fontSize: 16,
-  },
-  secBtn: {
-    backgroundColor: '#e74c3c',
+    marginTop: 5,
   },
 });

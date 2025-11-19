@@ -1,43 +1,120 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native';
+
+const PRIMARY_COLOR = '#007AFF';
+const ACCENT_COLOR = '#4CD964';
+const BACKGROUND_COLOR = '#f0f4f7';
 
 export default function ForgotPasswordScreen({ navigation }) {
   const [email, setEmail] = useState('');
 
   const handleReset = () => {
-    if (!email) {
-      alert('Por favor, digite seu e-mail.');
+    if (!email || !email.includes('@')) {
+      Alert.alert('Erro', 'Por favor, digite um e-mail válido.');
       return;
     }
-    alert(`Um link de redefinição foi enviado para: ${email}`);
-    navigation.navigate('Login');
+
+    Alert.alert(
+      'Sucesso!',
+      `Um link de redefinição de senha foi enviado para ${email}.`,
+      [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('Login'),
+        },
+      ]
+    );
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Recuperar Senha</Text>
+
+      <Text style={styles.subtitle}>
+        Insira seu e-mail para receber um link de redefinição.
+      </Text>
+
       <TextInput
         style={styles.input}
-        placeholder="Digite seu e-mail"
+        placeholder="E-mail"
+        placeholderTextColor="#999"
+        keyboardType="email-address"
+        autoCapitalize="none"
         value={email}
         onChangeText={setEmail}
       />
+
       <TouchableOpacity style={styles.button} onPress={handleReset}>
-        <Text style={styles.buttonText}>Enviar link</Text>
+        <Text style={styles.buttonText}>Enviar Link de Redefinição</Text>
       </TouchableOpacity>
 
+      {/* BOTÃO VOLTAR */}
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.link}>Voltar ao login</Text>
+        <Text style={styles.link}>← Voltar ao Login</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f2f2f2', padding: 20 },
-  title: { fontSize: 26, fontWeight: 'bold', marginBottom: 30 },
-  input: { width: '90%', height: 45, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 10, marginBottom: 15, borderWidth: 1, borderColor: '#ccc' },
-  button: { backgroundColor: '#1976d2', width: '90%', height: 45, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  link: { color: '#1976d2', marginTop: 15, fontWeight: 'bold' },
+  container: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: BACKGROUND_COLOR,
+    padding: 25,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: PRIMARY_COLOR,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    fontSize: 16,
+    elevation: 2,
+  },
+  button: {
+    backgroundColor: PRIMARY_COLOR,
+    width: '100%',
+    height: 50,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    elevation: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  link: {
+    color: PRIMARY_COLOR,
+    marginTop: 15,
+    fontWeight: '600',
+    fontSize: 16,
+  },
 });
